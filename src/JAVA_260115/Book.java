@@ -1,4 +1,4 @@
-package Test_2;
+package JAVA_260115;
         //클래스명 Book
 public class Book {
    //변수
