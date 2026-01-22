@@ -1,10 +1,7 @@
 package JAVA_260121.memberProject;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class AA_MainClass {
 
@@ -13,7 +10,7 @@ public class AA_MainClass {
 
     public static void main(String[] args) {
 
-    List<AA_MemberBase> members = new ArrayList<>();
+    Map<String, AA_MemberBase> members = new HashMap<>();
     loadMembers(members);
 
 
@@ -26,23 +23,25 @@ public class AA_MainClass {
     System.out.println("===== 회원 관리 시스템 =====");
 
         if (loggedInMember != null) {
-            System.out.println("\n*** 로그인 유저 ***");
-            System.out.println("***" + loggedInMember.getName() + "***\n");
+            System.out.println("-------------------------------------------");
+            System.out.println("로그인 한 유저 : " + loggedInMember.getEmail());
+            System.out.println("-------------------------------------------");
+            // 260121_기능추가_로그아웃, 순서1
+            System.out.println("1. 회원가입 2. 로그아웃 3. 회원정보 조회 4. 회원정보 수정 5. 회원 검색 6. 종료");
+        } else {
+
+            System.out.println("1. 회원가입 2. 로그인 3. 회원정보 조회 4. 회원정보 수정 5. 회원 검색 6. 종료");
         }
 
         System.out.println("안녕하세요 메뉴를 선택해주세요.");
-        System.out.println("" +
-                "1. 회원가입\n" +
-                "2. 로그인\n" +
-                "3. 회원정보 조회\n" +
-                "4. 종료");
         System.out.print(">>");
+
 
         int choice; //메뉴 선택 변수
 
         try{
             choice = Integer.parseInt(sc.nextLine());
-            if (choice < 1 || choice > 4){
+            if (choice < 1 || choice > 6){
                 System.out.println("메뉴를 확인해주세요.");
                 System.out.println("선택 가능 메뉴: 1~4");
                 continue;
@@ -63,67 +62,173 @@ public class AA_MainClass {
                     String name = sc.nextLine();
                     System.out.print("이메일: ");
                     String email = sc.nextLine();
+                        if(members.containsKey(email)) {
+                            System.out.println("이미 가입된 이메일입니다.");
+                            break;
+                        }
                     System.out.print("패스워드: ");
                     String password = sc.nextLine();
                     System.out.print("나이: ");
                     int age = Integer.parseInt(sc.nextLine());
 
                     AA_NormalMember newMember = new AA_NormalMember(name, email, password, age);
-                    members.add(newMember);
+                    members.put(email, newMember);
                     newMember.join();
 
                     saveMembers(members);
 
                     break;
 
-            case 2: /*로그인*/
-                System.out.println("===== 로그인 =====");
-                System.out.println("이메일과 패스워드를 입력해주세요");
-                System.out.print("이메일: ");
-                String loginEmail = sc.nextLine();
-                System.out.print("패스워드: ");
-                String loginPw = sc.nextLine();
+            case 2: /*로그인
+                if(loggedInMember != null) { // 로그인 된 상태
+                    loggedInMember = null; // 로그인 정보 초기화
+                    System.out.println("로그아웃 되었습니다.");
+                } else {
+                    System.out.println("===== 로그인 =====");
+                    System.out.println("이메일과 패스워드를 입력해주세요");
+                    System.out.print("이메일: ");
+                    String loginEmail = sc.nextLine();
+                    System.out.print("패스워드: ");
+                    String loginPw = sc.nextLine();
 
-                boolean isLogin = false;
+                    boolean isLogin = false;
 
-                for (AA_MemberBase member : members) {
-                    if (member.getEmail().equals(loginEmail) &&
-                        member.getPassword().equals(loginPw)) {
-                        System.out.println("\n로그인 성공!");
-                        System.out.println("환영합니다 [" + member.getName() + "]님");
+                    if(members.containsKey(loginEmail)) {
+                        AA_MemberBase member = members.get(loginEmail);
 
-                        isLogin = true;
+                        if(member.getEmail().equals(loginEmail) &&
+                                member.getPassword().equals(loginPw)
+                        ) {
+                            System.out.println("로그인 성공!! 환영합니다.~" + member.name+ "님");
+                            isLogin = true;
+                            loggedInMember = member;
+//                                break;
+                        } // if 닫기
+                        else { // 비밀번호가 틀린 경우
+                            System.out.println("패스워드가 틀렸습니다.");
 
-                        break;
+                        }
+                    } // for 닫기. -> if 닫기 변경.
+                    // 260121_기능추가_로그아웃, 순서3
+                    else {
+                        // 이메일이 존재하지 않는 경우
+                        System.out.println("존재하지 않는 이메일입니다. ");
                     }
                 }
-                if (isLogin == false) {
-                    System.out.println("\n로그인에 실패하였습니다");
-                    System.out.println("입력 정보가 일치하지 않습니다");
-                }
-
                 break;
 
             case 3: /*회원정보 조회*/
                 System.out.println("===== 회원정보 조회 =====");
 
-                if(members.size() == 0){
+                if(members.isEmpty()){
                     System.out.println("\n가입된 회원이 없습니다");
                 } else {
                     System.out.println("회원가입자 수: " + members.size() + "명");
                     System.out.println("--------------");
-
                 }
-
-                for (int i = 0; i < members.size(); i++){
-                    members.get(i).showInfo();
+                for (AA_MemberBase member: members.values()) {
+                    member.showInfo();
                     System.out.println("--------------");
                 }
 
                 break;
 
+            case 4: //회원정보 수정
+                if(loggedInMember == null) {
+                    System.out.println("로기인 후 수정 가능합니다.");
+                    break;
+                }
+                System.out.println("===== 회원정보 수정 =====");
+                System.out.println("수정할 항목을 선택하세요.");
+                System.out.println("1. 패스워드 2. 이름 3. 나이 4. 취소");
 
-            case 4: /*종료*/
+                String choiceNumber = sc.nextLine();
+
+                boolean isUpdated = false;
+
+                switch (choiceNumber) {
+                    case "1": //패스워드
+                        System.out.print("새 패스워드 입력: ");
+                        String newPw = sc.nextLine();
+                        loggedInMember.setPassword(newPw);
+                        isUpdated = true;
+
+                        break;
+
+                    case "2": //이름
+                        System.out.print("수정할 이름: ");
+                        String newName = sc.nextLine();
+                        loggedInMember.setName(newName);
+                        isUpdated = true;
+
+                        break;
+
+                    case "3": //나이
+                        System.out.print("수정할 나이 입력: ");
+                        int newAge = Integer.parseInt(sc.nextLine());
+                        loggedInMember.setAge(newAge);
+                        isUpdated = true;
+
+                        break;
+
+                    case "4": //취소
+                        System.out.println("수정을 취소합니다.");
+                        break;
+
+                    default: System.out.println("잘못된 입력입니다.");
+                }
+
+            case 5: //회원 검색
+                System.out.println("\n===회원 검색====");
+                System.out.println("1. 이메일(ID)로 검색 정확히 일치");
+                System.out.println("2. 이름으로 검색 (포함된 이름)");
+                System.out.print("번호 선택 >>");
+
+                String searchType = sc.nextLine();
+
+                if(searchType.equals("1")) {
+                    // 이메일로 검색
+                    System.out.println("검색할 이메일 입력 : ");
+                    String searchEmail = sc.nextLine();
+
+                    if(members.containsKey(searchEmail)) {
+                        System.out.println("\n 검색 결과");
+                        System.out.println("--------------");
+                        members.get(searchEmail).showInfo();
+                        System.out.println("--------------");
+                    } else {
+                        System.out.println("해당 이메일의 회원이 업습니다.");
+                    }
+
+                } else if (searchType.equals("2")) {
+                    // 이름으로 검색.
+                    System.out.println("검색할 이름 입력:" );
+                    String searchName= sc.nextLine();
+
+                    boolean isFound = false;
+                    System.out.println("\n검색중....\n");
+                    System.out.println("--------------");
+
+                    for(AA_MemberBase m: members.values()) {
+                        if(m.getName().contains(searchName)) {
+                            m.showInfo();
+                            System.out.println("--------------");
+                            isFound = true;
+                        }
+                    } // for 닫기
+                    // 없을 경우.
+                    if(!isFound) {
+                        System.out.println("회원을 찾을수 없습니다. ");
+                    }
+
+                } else {
+                    System.out.println("잘못된 입력입니다.");
+                }
+                break;
+
+
+
+            case 6: /*종료*/
                 System.out.println("프로그램을 종료합니다.");
                 sc.close();
                 return; //메인 메서드 종료
@@ -140,13 +245,13 @@ public class AA_MainClass {
 } //main
 
     //입력 정보(members 리스트) 저장하기
-    public static void saveMembers(List<AA_MemberBase> members){
+    public static void saveMembers(Map<String, AA_MemberBase> members){
         BufferedWriter bw = null;
 
         try {
             bw = new BufferedWriter(new FileWriter(FILE_NAME));
 
-            for(AA_MemberBase m : members) {
+            for(AA_MemberBase m : members.values()) {
               String line = m.getName()+","+m.getEmail()+","+m.getPassword()+","+m.getAge();
                 bw.write(line); //파일에 한줄씩 기록
                 bw.newLine(); //줄바꿈
@@ -169,7 +274,7 @@ public class AA_MainClass {
         }
     } // 신규 메소드(저장하는)
 
-    private static int loadMembers(List<AA_MemberBase> members) {
+    private static int loadMembers(Map<String, AA_MemberBase> members) {
         File file = new File(FILE_NAME);
         if(!file.exists()) { // 해당 파일이 존재 안하니? true(파일없다)
             return 0;
@@ -216,7 +321,7 @@ public class AA_MainClass {
 
                     // 260121_업그레이드_배열에서ArrayList_변경, 순서6-4
 //                    members[loadCount] = new _3_NormalMember(name,email,password,age);
-                    members.add(new AA_NormalMember(name,email,password,age));
+                    members.put(email, new AA_NormalMember(name,email,password,age));
 
                     // 파일에서 불러온 사람의 숫자를 확인하는 상태 변수 카운트 1증가.
                     loadCount++;

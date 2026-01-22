@@ -16,6 +16,7 @@ public abstract class AA_MemberBase {
     //메소드
     public abstract void showInfo();
 
+    //회원정보 불러오기 메소드
     public String getName() {
         return name;
     }
@@ -27,5 +28,19 @@ public abstract class AA_MemberBase {
     }
     public int getAge() {
         return age;
+    }
+
+    //회원정보 수정 메소드
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public void setAge(int age) {
+        this.age = age;
     }
 }
