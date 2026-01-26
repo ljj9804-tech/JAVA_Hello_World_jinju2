@@ -85,7 +85,7 @@ public class AA_MainClass extends JFrame {
 
                     break;
 
-            case 2: /*로그인
+            case 2: //로그인
                 if(loggedInMember != null) { // 로그인 된 상태
                     loggedInMember = null; // 로그인 정보 초기화
                     System.out.println("로그아웃 되었습니다.");
@@ -108,7 +108,7 @@ public class AA_MainClass extends JFrame {
                             System.out.println("로그인 성공!! 환영합니다.~" + member.name+ "님");
                             isLogin = true;
                             loggedInMember = member;
-//                                break;
+                                break;
                         } // if 닫기
                         else { // 비밀번호가 틀린 경우
                             System.out.println("패스워드가 틀렸습니다.");

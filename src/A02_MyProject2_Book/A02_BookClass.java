@@ -32,7 +32,12 @@ public class A02_BookClass {
     //도서 정보 출력
     public void showBookInfo() {
         String status = isAvailable ? "대여 가능" : "대여 중";
-        System.out.println("[" + bookId + "] 제목: " + title + "\n저자: " + writer + "\n대여 가능 여부: " + status);
+        System.out.println("[" + bookId + "]\n제목: " + title + "\n저자: " + writer + "\n대여 가능 여부: " + status);
+    }
+
+    // 저자(writer) 정보를 반환하는 Getter
+    public String getWriter() {
+        return writer;
     }
 
 
